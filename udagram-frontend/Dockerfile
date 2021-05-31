@@ -1,24 +1,32 @@
-# Build
-FROM beevelop/ionic:latest AS ionic
+#https://medium.com/@knoldus/deployment-with-docker-in-ionic-2797ebbe65ec
 
-# Create app directory
+# Use NodeJS base image
+FROM node:latest AS build
+
+# Create app directory in Docker
 WORKDIR /usr/src/app
 
 # Install app dependencies by copying
 # package.json and package-lock.json
 COPY package*.json ./
 
-# Install app dependencies
+# Install dependencies in Docker
 RUN npm ci
 
-# Bundle app source
+# Install Ionic
+RUN npm install -g ionic
+
+# Copy app from local environment into the Docker image
 COPY . .
 
-#transpile our ts files to js
+# Build the Ionic application
 RUN ionic build
 
-## Run 
+# Use Nginx base image
 FROM nginx:alpine
 
-#COPY www /usr/share/nginx/html
-COPY --from=ionic  /usr/src/app/www /usr/share/nginx/html
+#we are removing everything present in
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy build artifacts to Nginx html folder for static hosting
+COPY --from=build /usr/src/app/www /usr/share/nginx/html

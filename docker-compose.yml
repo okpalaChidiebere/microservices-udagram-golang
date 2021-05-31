@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+
+  # Proxies requests to internal services
+  reverseproxy:
+    image: aluminetchidiebre/udagram-reverseproxy:latest # goes to your repository on Docker Hub. This will make it easier to run 'docker-compse push' to push the images to our Dockerhub after logining in to our console
+    container_name: reverseproxy
+    build:
+      context: ./reverse-proxy
+    depends_on: #the services listed here will be ochestrated by docker-compose.
+        - feed-service
+        - user-service
+    ports:
+      - "8080:8080"
+    restart: always
+
+  # generates FrontEnd
+  udagram-frontend:
+    image: aluminetchidiebre/udagram-frontend:latest  # goes to your repository on Docker Hub
+    container_name: udagram-frontend
+    build:
+      context: ./udagram-frontend
+    ports:
+      - "8100:80" #we are mapping port 80 on nginx for for ioic app from our container into port 8100 locally. eg to run this frontend we would do http://localhost:8100 If i had wanted http://localhost i will map 80:80
+    restart: on-failure
+
+  # Retrieves the feed microservice
+  user-service:
+    image: aluminetchidiebre/user-go-service:latest # goes to your repository on Docker Hub
+    container_name: user-service
+    build:
+      context: ./udagram-api-user
+    environment: #this variables will be set to the container during runtime. eg 'docker-compose --env-file ./docker/.env.dev up'  if i dont specify the flag, by default the docker-compose command will look for a file named .env in the directory you run the command. *remember to add the env file to gitignore
+      # during docker-compose build the default value will be empty.
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      JWT_SECRET: ${JWT_SECRET}
+    restart: on-failure
+
+
+  # Generates the user microservice
+  feed-service:
+    image: aluminetchidiebre/feed-go-service:latest  # goes to your repository on Docker Hub
+    container_name: feed-service
+    volumes: #volume are a good way to persist data across the lifetime of the container
+      - $HOME/.aws:/root/.aws:ro  #:ro - stands for read-only docker volume. we copied the aws folder from our root user local machine to the root user on docker. we can also use ~ but $HOME env variable works as well.  https://stackoverflow.com/questions/36354423/what-is-the-best-way-to-pass-aws-credentials-to-a-docker-container
+    build:
+      context: ./udagram-api-feed
+    environment:
+      # during docker-compose build the default value will be empty.
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE} 
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      AWS_REGION: ${AWS_REGION}
+      AWS_PROFILE: ${AWS_PROFILE} 
+      AWS_MEDIA_BUCKET: ${AWS_MEDIA_BUCKET}
+      JWT_SECRET: ${JWT_SECRET}
+    restart: on-failure
