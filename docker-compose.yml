@@ -4,7 +4,7 @@ services:
 
   # Proxies requests to internal services
   reverseproxy:
-    image: aluminetchidiebre/udagram-reverseproxy:latest # goes to your repository on Docker Hub. This will make it easier to run 'docker-compse push' to push the images to our Dockerhub after logining in to our console
+    image: aluminetchidiebre/udagram-reverseproxy:latest # goes to your repository on Docker Hub. This will make it easier to run 'docker-compse push' to push the images to our Dockerhub after logining in to our console. The tag "latest" is good to define explicity so that we can pull the latest image version locally using "docker-compose push"
     container_name: reverseproxy
     build:
       context: ./reverse-proxy
