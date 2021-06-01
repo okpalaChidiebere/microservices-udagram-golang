@@ -1,16 +1,16 @@
 # We are Refactoring Monolith to Microservices
 
-1. **Refactor the API**
+1. **Refactor the API:**
 The monilith API code currently contains logic for both /users and /feed endpoints. I decompose the API code so that we can have two separate projects that can be run independent of one another. We ended up having a different prpkect for the /user called  udagram-api-user and /feed called udagram-api-feed. You may find yourself copying a lot of duplicate code into the separate projects -- this is expected! For now, focus on breaking apart the monolith and we can focus on cleaning up the application code afterwards.
 
-2. **Implement Reverse Proxy to Direct Backend Requests**
+2. **Implement Reverse Proxy to Direct Backend Requests:**
 A reversproxy streamlines the experience so that a consumer only cares about communication with the reverseproxy and not the services that it points to. Our front-end communicates with the reverseproxy for our backend APIs. It makes it easy for our front-end to integrate. If we create more microservices at a later time, our front-end can have less overhead to handle new request. 
 The front-end treats every microservice as a single api under the /api endpoint. The front end dont care what is behine the reverseproxy. The reverseProxy handles routing and mapping to the appropriate api behind the scenes. Nginx is a web server that can be used as a reverse proxy. Our nginx webserver listens for http request comming in at port 8080 on our local machine then forwards requests on behalf of the client to the appropriate microservice based on the pendpoint path and appears to the client as the origin of the responses
 
-3.  **Containerize the Code**
+3.  **Containerize the Code:**
 Start with creating Dockerfiles for the frontend and backend applications. Each project should have its own Dockerfile. Then after we used docker-compose to test the ochestration of the reverseproxy for thesame way it will perform at kubernetes. We used docker-compose to start all the containers for all for images at thesame time. Everything was working fine, then we can push all the images to dockerhub with docker-compose
 
-4. **Build CICD Pipeline with [Travis CI](https://docs.travis-ci.com/user/for-beginners/)**
+4. **Build CICD Pipeline with [Travis CI](https://docs.travis-ci.com/user/for-beginners/):**
 After setting up your GitHub account to integrate with Travis CI, set up a GitHub repository with a .travis.yml file for a build pipeline to be generated. Once you have the travis.yml in a repo and have your travis account integrated to your github account, travis will look through all your gitbub repositories and when it detects any repo with .travis.yml file, it will recognize that project as something it will set up in the trevis dashboard. Remember to set the environmental varibales for your travis build process of the github repo. Be careful not to echo you secret environmental varibales; look at best practises [here](https://docs.travis-ci.com/user/best-practices-security/)  Looking at the commands we are running in our travis, we used docker-compose. This means any change we made to one microservice in this project repo and push to commit and push to github, the whole services will be build again. This necessary may not be a bad thing knowing that docker do cache your changes for build process to have shorter and shorter time but its something to consider. 
 
 

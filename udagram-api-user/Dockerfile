@@ -28,4 +28,4 @@ EXPOSE 8080
 CMD ["./main"]
 
 #This is a very simple dockerfile for our app. If you want to see a more complicated dockerfile for your go app where
-#were you run bash files look at Using the .env file allows you to take a write-once-use-often approach to configuring your containers. Although you might not use the exact same variables for various containers, it allows you to create a single .env file and then easily edit the values, so it can be repurposed for other containers. This also makes for easier writing of docker-compose.yml files, as you're not having to hard-code all environment variables. 
+#were you run bash files look at https://github.com/techschool/simplebank/blob/master/Dockerfile

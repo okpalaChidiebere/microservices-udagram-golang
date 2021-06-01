@@ -26,3 +26,6 @@ EXPOSE 8080
 
 # Command to run the executable. We define the Docker image's behavior at runtime
 CMD ["./main"]
+
+#This is a very simple dockerfile for our app. If you want to see a more complicated dockerfile for your go app where
+#were you run bash files look at https://github.com/techschool/simplebank/blob/master/Dockerfile
