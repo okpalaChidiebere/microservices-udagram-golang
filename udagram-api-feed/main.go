@@ -51,6 +51,7 @@ func main() {
 
 	// Define "root" routes using r
 	r.Methods("GET").Path("/").HandlerFunc(index)
+	r.Methods("GET").Path("/health").HandlerFunc(fh.CheckDbConnectionHandler)
 
 	// Define "Subrouter" routes using feedRouter, prefix is /api/v0/feed/...
 	authFeedRouter := feedRouter.PathPrefix("").Subrouter() //this subRouter under feedRouter

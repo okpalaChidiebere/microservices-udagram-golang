@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -30,6 +31,14 @@ type User struct {
 type RegisterUserRequest struct {
 	Email             string `json:"email"`
 	PlainTextPassword string `json:"password"` //eg: imageName.jpeg
+}
+
+func CheckDbConnection(ctx context.Context) error {
+
+	pid := ctx.Value("processID").(string)
+	log.Printf("%s - Checking database connection...", pid)
+
+	return aws.DB.Ping()
 }
 
 func GetUserByPk(email string) (User, error) {

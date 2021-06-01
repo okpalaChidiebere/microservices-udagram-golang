@@ -1,6 +1,7 @@
 package feeds
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -27,6 +28,14 @@ type CreateFeedItemRequest struct {
 var (
 	s3s = aws.NewS3client()
 )
+
+func CheckDbConnection(ctx context.Context) error {
+
+	pid := ctx.Value("processID").(string)
+	log.Printf("%s - Checking database connection...", pid)
+
+	return aws.DB.Ping()
+}
 
 func AllFeedItems() ([]FeedItem, error) {
 	rows, err := aws.DB.Query("SELECT id, caption, url, created_at, updated_at FROM feeditem;")

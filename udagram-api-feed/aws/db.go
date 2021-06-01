@@ -2,7 +2,6 @@ package aws
 
 import (
 	"database/sql"
-	"fmt"
 
 	"feed-service/config"
 
@@ -20,8 +19,4 @@ func init() {
 		panic(err)
 	}
 
-	if err = DB.Ping(); err != nil {
-		panic(err)
-	}
-	fmt.Println("You connected to your database.")
 }
