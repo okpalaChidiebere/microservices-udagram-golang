@@ -1,0 +1,19 @@
+#We assume the API is only meant to be consumed by the frontend web application. 
+# We set up ingress rules so that only web requests from our web application 
+# can make successful API requests.
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-resource-backend
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: udagram-frontend
+            port:
+              number: 80
