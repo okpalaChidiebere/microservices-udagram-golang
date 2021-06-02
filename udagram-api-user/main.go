@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -71,6 +72,7 @@ func main() {
 	http.Handle("/favicon.ico", http.NotFoundHandler()) //nice to have :)
 	http.Handle("/", r)
 	http.ListenAndServe(":"+port, nil)
+	log.Printf(`server running %s`, os.Getenv("URL"))
 }
 
 func index(w http.ResponseWriter, r *http.Request) {

@@ -33,3 +33,6 @@ RUN rm -rf /usr/share/nginx/html/*
 
 # Copy build artifacts to Nginx html folder for static hosting
 COPY --from=build /usr/src/app/www /usr/share/nginx/html
+
+# Copy custom Nginx config, to fix an annoying bug :(
+COPY nginx.conf /etc/nginx/nginx.conf
