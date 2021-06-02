@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: feed-service
-        image: aluminetchidiebre/feed-go-service
+        image: aluminetchidiebre/feed-go-service:latest #You must add the tag "latest" this way k*s will always pull the latest image version for you
         imagePullPolicy: Always          
         resources:
           requests:
@@ -74,6 +74,11 @@ spec:
             secretKeyRef:
               name: env-secret
               key: POSTGRES_USERNAME
+        - name: URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: URL
         volumeMounts:
         - name: aws-secret
           mountPath: "/root/.aws/"  #making our aws configured in you local environment. This will be the path our containser will store our aws credentials just the way it is on our local machine

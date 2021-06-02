@@ -7,6 +7,6 @@ data:
   JWT_SECRET: ___INSERT_JWT_SECRET___
   POSTGRES_DATABASE: ___INSERT_POSTGRES_DATABASE___
   POSTGRES_HOST: ___INSERT_POSTGRES_HOST___
-  URL: __FRONT_END_EXTERNAL_IP___OR__FRONTEND_LOADBALANCER_URL__ #eg http://<long_loadbalancerUrl>:<portNumber>
+  URL: __FRONT_END_EXTERNAL_IP___OR__FRONTEND_LOADBALANCER_URL__ #eg http://localhost or http://<long_loadbalancerUrl> NOTE: there is no port numbers here. It is intentional because the we the port number for the front-end to be 80 which is default for HTTP browser requests
 metadata:
   name: env-config

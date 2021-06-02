@@ -16,7 +16,7 @@ spec:
     spec:
       containers: # we define the container where we want the docker image pulled from
       - name: user-service
-        image: aluminetchidiebre/user-go-service # this points to the dockerhub for my dockerimage that i want created in the pods
+        image: aluminetchidiebre/user-go-service:latest # this points to the dockerhub for my dockerimage that i want created in the pods. You must add the tag "latest" this way k*s will always pull the latest image version for you
         imagePullPolicy: Always          
         resources: # we set the compute resources that our pod will be running on; limiting memeory and cpu that this pod will use
           requests:
@@ -74,4 +74,9 @@ spec:
             secretKeyRef:
               name: env-secret
               key: POSTGRES_USERNAME
+        - name: URL
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: URL
       restartPolicy: Always
