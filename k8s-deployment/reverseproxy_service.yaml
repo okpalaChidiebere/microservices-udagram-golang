@@ -11,3 +11,4 @@ spec:
     targetPort: 8080
   selector:
     service: reverseproxy
+  type: LoadBalancer #This gives us a public url that we our front end can invokoe. The reversproxy is the middle man that then direct the requests to the right microservice! So in this case, this reverseproxy is opened to outside of the cluster
