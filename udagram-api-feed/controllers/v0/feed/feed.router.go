@@ -100,7 +100,7 @@ func CheckDbConnectionHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("%s - Unable to connect to the database: %s", pId, err.Error())
 
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(w, "Unable to connect to the database.")
 		return
 	}

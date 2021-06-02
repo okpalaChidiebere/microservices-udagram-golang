@@ -29,7 +29,7 @@ spec:
         - containerPort: 8080
         livenessProbe: #We define this to tell, kubernetes what makes a pod healthy vs a pod having issues
             httpGet:
-              path: /health # Here, we define an endpoint that an api consumer can reach to verify that my app is healthy
+              path: /health # Here, we define an endpoint that an api consumer can reach to verify that my app is healthy. If this api return any other status code other than 200, k8s will mark it as unhealty, terminate it and create a new one to maintain the number of replicas specified for this pod
               port: 8080
             initialDelaySeconds: 15  # The kubelet will run the first liveness probe 15 seconds after the container starts. If you make the value too small like 3 seconds your container might enter a crashloop because your container has not started running for the health endpoint to work
             periodSeconds: 20  # kubelet will continue to run this check every 20 seconds.
