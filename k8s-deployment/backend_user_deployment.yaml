@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service #we give our pod a name so that we can reference it
+  labels:
+    service: user-service
+spec:
+  replicas: 2 #we have two pods to be created at start to handle horizontal scalling. Note: we can set the max number of pods to be created later
+  selector:
+    matchLabels:
+      service: user-service
+  template:
+    metadata:
+      labels:
+        service: user-service
+    spec:
+      containers: # we define the container where we want the docker image pulled from
+      - name: user-service
+        image: aluminetchidiebre/user-go-service # this points to the dockerhub for my dockerimage that i want created in the pods
+        imagePullPolicy: Always          
+        resources: # we set the compute resources that our pod will be running on; limiting memeory and cpu that this pod will use
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"       
+        ports:
+        - containerPort: 8080
+        livenessProbe: #We define this to tell, kubernetes what makes a pod healthy vs a pod having issues
+            httpGet:
+              path: /health # Here, we define an endpoint that an api consumer can reach to verify that my app is healthy
+              port: 8080
+            initialDelaySeconds: 15  # The kubelet will run the first liveness probe 15 seconds after the container starts. If you make the value too small like 3 seconds your container might enter a crashloop because your container has not started running for the health endpoint to work
+            periodSeconds: 20  # kubelet will continue to run this check every 20 seconds.
+        env: # we define environmental vairables for this pod linking them to this env-config.yaml file we already applied to the cluster before now
+        - name: AWS_MEDIA_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_MEDIA_BUCKET
+        - name: AWS_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_PROFILE
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_REGION
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: JWT_SECRET
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: POSTGRES_DATABASE
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: POSTGRES_USERNAME
+      restartPolicy: Always

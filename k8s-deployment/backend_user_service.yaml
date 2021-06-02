@@ -1,0 +1,14 @@
+#this file binds our Service to our deployment
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: user-service
+  name: user-service # the name should be thesame with the server host name inside one of your nginx upstream. otherwise your reverseproxy will crash becasue it cant reference this service to listen for
+spec:
+  ports: # we are specifiying that we want our service exposed at port 8080. Whhich is what our reverseproxy expects
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: user-service
