@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: udagram-frontend
+  name: udagram-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: udagram-frontend
+  template:
+    metadata:
+      labels:
+        service: udagram-frontend
+        api: external
+    spec:
+      containers:
+      - image: aluminetchidiebre/udagram-frontend:latest
+        name: udagram-frontend
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80 #Port 80 is the default for HTTP, so the frontend should be expose in port  which the nngix we set up for our front-end from Dockerfile is doing not 8100 for development
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+      restartPolicy: Always

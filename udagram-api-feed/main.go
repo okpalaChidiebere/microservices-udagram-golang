@@ -28,7 +28,7 @@ func main() {
 	r.Use(
 		func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8100")
+				w.Header().Set("Access-Control-Allow-Origin", os.Getenv("URL"))
 				w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 				w.Header().Set("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE")
 				next.ServeHTTP(w, r)

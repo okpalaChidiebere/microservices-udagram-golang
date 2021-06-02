@@ -22,6 +22,9 @@ COPY . .
 # Build the Ionic application
 RUN ionic build
 
+# Set the application's port number. We expose the nginx for our ionic frontend will be listening for requests on port 80
+EXPOSE 80
+
 # Use Nginx base image
 FROM nginx:alpine
 

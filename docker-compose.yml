@@ -22,7 +22,7 @@ services:
     build:
       context: ./udagram-frontend
     ports:
-      - "8100:80" #we are mapping port 80 on nginx for for ioic app from our container into port 8100 locally. eg to run this frontend we would do http://localhost:8100 If i had wanted http://localhost i will map 80:80
+      - "80:80" #we are mapping port 80(left) on our local machine for HTTp request to port 80 on the container(right). So in order to direct request to the frontend we map the front-end nginx port number to our local machine
     restart: on-failure
 
   # Retrieves the feed microservice
@@ -38,6 +38,7 @@ services:
       POSTGRES_DATABASE: ${POSTGRES_DATABASE}
       POSTGRES_HOST: ${POSTGRES_HOST}
       JWT_SECRET: ${JWT_SECRET}
+      URL: ${URL}
     restart: on-failure
 
 
@@ -59,4 +60,5 @@ services:
       AWS_PROFILE: ${AWS_PROFILE} 
       AWS_MEDIA_BUCKET: ${AWS_MEDIA_BUCKET}
       JWT_SECRET: ${JWT_SECRET}
+      URL: ${URL}
     restart: on-failure
