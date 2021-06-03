@@ -2,19 +2,25 @@
 
 1. **Refactor the API:**
 The monilith API code currently contains logic for both /users and /feed endpoints. I decompose the API code so that we can have two separate projects that can be run independent of one another. We ended up having a different prpkect for the /user called  udagram-api-user and /feed called udagram-api-feed. You may find yourself copying a lot of duplicate code into the separate projects -- this is expected! For now, focus on breaking apart the monolith and we can focus on cleaning up the application code afterwards.
+There are different microservices architecture desgins you can explore on your own
 
 2. **Logging**
 Use logs to capture metrics. This can help us with debugging. Make sure you implement best practices for logging like assigning a process id to each request. You can pass this id to the request context. This way you can trace all the process that is related to a request through out you application. You can also use exports your logs to external services like datadog, where they expect your logs in a particular format so that they can paerse it for you.
 
 3. **Implement Reverse Proxy to Direct Backend Requests:**
-A reversproxy streamlines the experience so that a consumer only cares about communication with the reverseproxy and not the services that it points to. Our front-end communicates with the reverseproxy for our backend APIs. It makes it easy for our front-end to integrate. If we create more microservices at a later time, our front-end can have less overhead to handle new request. 
-The front-end treats every microservice as a single api under the /api endpoint. The front end dont care what is behine the reverseproxy. The reverseProxy handles routing and mapping to the appropriate api behind the scenes. Nginx is a web server that can be used as a reverse proxy. Our nginx webserver listens for http request comming in at port 8080 on our local machine then forwards requests on behalf of the client to the appropriate microservice based on the pendpoint path and appears to the client as the origin of the responses
+- A reversproxy streamlines the experience so that a consumer only cares about communication with the reverseproxy and not the services that it points to. Our front-end communicates with the reverseproxy for our backend APIs. It makes it easy for our front-end to integrate. If we create more microservices at a later time, our front-end can have less overhead to handle new request. 
+- The front-end treats every microservice as a single api under the /api endpoint. The front end dont care what is behine the reverseproxy. The reverseProxy handles routing and mapping to the appropriate api behind the scenes. Nginx is a web server that can be used as a reverse proxy. Our nginx webserver listens for http request comming in at port 8080 on our local machine then forwards requests on behalf of the client to the appropriate microservice based on the pendpoint path and appears to the client as the origin of the responses
+- ReverseProxy is one way of Securing your backened services
 
 4.  **Containerize the Code:**
-Start with creating Dockerfiles for the frontend and backend applications. Each project should have its own Dockerfile. Then after we used docker-compose to test the ochestration of the reverseproxy for thesame way it will perform at kubernetes. We used docker-compose to start all the containers for all for images at thesame time. Everything was working fine, then we can push all the images to dockerhub with docker-compose
+- Start with creating Dockerfiles for the frontend and backend applications. Each project should have its own Dockerfile. Then after we used docker-compose to test the ochestration of the reverseproxy for thesame way it will perform at kubernetes. We used docker-compose to start all the containers for all for images at thesame time. Everything was working fine, then we can push all the images to dockerhub with docker-compose
+- We build built and ran our container images using docker
+- We store our docker images with a container registry like DockerHub
 
-5. **Build CICD Pipeline with [Travis CI](https://docs.travis-ci.com/user/for-beginners/):**
-After setting up your GitHub account to integrate with Travis CI, set up a GitHub repository with a .travis.yml file for a build pipeline to be generated. Once you have the travis.yml in a repo and have your travis account integrated to your github account, travis will look through all your gitbub repositories and when it detects any repo with .travis.yml file, it will recognize that project as something it will set up in the trevis dashboard. Remember to set the environmental varibales for your travis build process of the github repo. Be careful not to echo you secret environmental varibales; look at best practises [here](https://docs.travis-ci.com/user/best-practices-security/)  Looking at the commands we are running in our travis, we used docker-compose. This means any change we made to one microservice in this project repo and push to commit and push to github, the whole services will be build again. This necessary may not be a bad thing knowing that docker do cache your changes for build process to have shorter and shorter time but its something to consider.
+5. **Build CI/CD Pipeline with [Travis CI](https://docs.travis-ci.com/user/for-beginners/):**
+- After setting up your GitHub account to integrate with Travis CI, set up a GitHub repository with a .travis.yml file for a build pipeline to be generated. Once you have the travis.yml in a repo and have your travis account integrated to your github account, travis will look through all your gitbub repositories and when it detects any repo with .travis.yml file, it will recognize that project as something it will set up in the trevis dashboard. Remember to set the environmental varibales for your travis build process of the github repo. Be careful not to echo you secret environmental varibales; look at best practises [here](https://docs.travis-ci.com/user/best-practices-security/)  Looking at the commands we are running in our travis, we used docker-compose. This means any change we made to one microservice in this project repo and push to commit and push to github, the whole services will be build again. This necessary may not be a bad thing knowing that docker do cache your changes for build process to have shorter and shorter time but its something to consider.
+- Travis helps us take care of the CI portion of the CICD pilpeline. We integrate github as part of CI/CD and we automate testing using CI
+- Other Alternatives to CI are Jenkins
 
 6. **Implement a Health Endpoint:**
 This help us to determine when a pod is not healthy. When a port is not healthy, k8s will try to terminate it and generate another
@@ -24,6 +30,8 @@ This help us to determine when a pod is not healthy. When a port is not healthy,
 At this point, you should have a cluster created following these [steps](https://blog.juadel.com/2020/05/15/create-a-kubernetes-cluster-in-amazon-eks-using-a-reverse-proxy/) and the k8s ConfigMap and Secrets environmental varibales applied to your cluster from the kubectl CLI. This way when you deploy your pods, they can use the enviromental variable right away. Two things to consider, 
 - A deployment yaml file: This specifies how we deploy an application. In practise, this is similar to how we use docker-compose file to set up docker containers that will run our pods. He explicitly specify in the yml file that this is a deployment file right at the second line. We define it in the "Kind" key of value "deployment"
 - A service yml file: This specifies how we configure the service that exposes our application to our consumers. We explicitly define that this is a service file as well
+- Look at this article(https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes) for best practices on health checks, readiness and liveness probs for your deployment
+- Alternative Deployment strategies are [AWS ECS](https://aws.amazon.com/ecs/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc&ecs-blogs.sort-by=item.additionalFields.createdDate&ecs-blogs.sort-order=desc), [AWS Fargate](https://aws.amazon.com/fargate/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc&fargate-blogs.sort-by=item.additionalFields.createdDate&fargate-blogs.sort-order=desc), [AWS App runner](https://aws.amazon.com/apprunner/)
 
 8. **Secure the API:**
 - we want the APIs to be consumed by the frontend web application. So, we set up ingress rules so that only web requests from our web application can make successful API requests.
@@ -111,8 +119,7 @@ Do not commit your env file to github
 
 
 
-If you want to see how to create eks cluster and node group from AWS CLI, but you will need [eksctl cli](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)
-watch this [youtube video](https://www.youtube.com/watch?v=aGTOVaVXz7k&t=474s) and [this video](https://www.youtube.com/watch?v=p6xDCz00TxU&t=664s).
+If you want to see how to create eks cluster and node group from AWS CLI, but you will need [eksctl cli](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html) watch this [youtube video](https://www.youtube.com/watch?v=aGTOVaVXz7k&t=474s) and [this video](https://www.youtube.com/watch?v=p6xDCz00TxU&t=664s).
 
 
 Setting up your system the first time for k8s on mac. Run these commands insequence
@@ -121,10 +128,11 @@ Setting up your system the first time for k8s on mac. Run these commands inseque
 - `brew install weaveworks/tap/eksctl` not ncessary but good if you want to create clusters from the console
 - `brew install aws-iam-authenticator` to confirm you have aws autheniticator
 run `aws sts get-caller-identity` to confirm a user is logged in to aws in console. if no aws user is logged in run `aws configure` and log in a user credentials
-- `aws eks --region <region-code. update-kubeconfig --name <cluster_Name>`
+- `aws eks --region <region-code> update-kubeconfig --name <cluster_Name>` to connect kubectl against your cluster created on aws. Kubernetes is not created by aws so oyu have to make this connect. This way, any kubectl commands you run here will be applied to your cluster
 
 
 On your won explore 
 - how to deploy private images to k8s
 - Approcaches to pass database connection to controllers [here](https://techinscribed.com/different-approaches-to-pass-database-connection-into-controllers-in-golang/)
 - nginx configurations [here](https://docs.viblast.com/player/cors/cors-on-nginx)
+- Courses on more golang operations for APIS like DB migration, DB transaction, etc [here](https://dev.to/techschoolguru/how-to-create-and-verify-jwt-paseto-token-in-golang-1l5j)
