@@ -5,7 +5,7 @@ metadata:
   labels:
     service: user-service
 spec:
-  replicas: 2 #we have two pods to be created at start to handle horizontal scalling. Note: we can set the max number of pods to be created later
+  replicas: 2 #we have two pods to be created at start to handle horizontal scalling which ce can configure later. Kubernetes will attempt to maintain the number of desired replicas. If a pod is terminated, it will automatically recreate the pod.
   selector:
     matchLabels:
       service: user-service
@@ -27,11 +27,11 @@ spec:
             cpu: "500m"       
         ports:
         - containerPort: 8080
-        livenessProbe: #We define this to tell, kubernetes what makes a pod healthy vs a pod having issues
+        livenessProbe: #We define this to tell kubernetes if our pod is working at expected in the "READY" state. What makes a pod healthy vs a pod having issues. This important for Self-healing. Self-Healing means that k8s will delete the pod and create a new one
             httpGet:
-              path: /health # Here, we define an endpoint that an api consumer can reach to verify that my app is healthy. If this api return any other status code other than 200, k8s will mark it as unhealty, terminate it and create a new one to maintain the number of replicas specified for this pod
+              path: /health # Here, we define an endpoint that an api consumer(like k8s) can reach to verify that my app is healthy. If this api return any other status code other than 200, k8s will mark it as unhealty, terminate it and recreate a new one to maintain the desired number of replicas specified for this delpoyment
               port: 8080
-            initialDelaySeconds: 15  # The kubelet will run the first liveness probe 15 seconds after the container starts. If you make the value too small like 3 seconds your container might enter a crashloop because your container has not started running for the health endpoint to work
+            initialDelaySeconds: 15  # The kubelet will run the first liveness probe 15 seconds after the container starts. If you make the value too small like 3 seconds your container might enter a crashloop error because your container has not started running for the health endpoint to be invokable
             periodSeconds: 20  # kubelet will continue to run this check every 20 seconds.
         env: # we define environmental vairables for this pod linking them to this env-config.yaml file we already applied to the cluster before now
         - name: AWS_MEDIA_BUCKET
